@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "kr.co.dong.boardMapper">
+
+<!-- ============================================================= 회원 ============================================================= -->
+   
+	<!--  로그인 처리를 위한 SQL -->
+    <select id="login" parameterType="java.util.Map" resultType="java.util.Map">
+       SELECT m_id, m_ename, m_name, m_pt, m_ste, m_pw, m_email, m_tel, m_pt_dt, m_dt, m_adv_yn
+         FROM tb_membership
+        WHERE m_id = #{m_id}
+          AND m_pw = #{m_pw}
+          AND m_ste != 2;
+    </select>
+    
+    <!-- 세션 초기화 -->
+    <select id="sessionId" parameterType="UserDTO" resultType="UserDTO" >
+   	   SELECT m_id, m_ename, m_name, m_pt, m_ste, m_dt, m_pt_dt
+         FROM tb_membership
+        WHERE m_id = #{m_id}
+          AND m_pw = #{m_pw};
+    </select>
+   
+    <!-- 최근 로그인 기록 -->
+    <update id="latelyLogin" parameterType="UserDTO">
+   	 	update tb_membership
+   	 	   set m_dt = curdate()
+   	 	 where m_id = #{m_id};
+    </update>
+   
+
+	<!-- 회원가입 -->
+   	<insert id="joinMember" parameterType="UserDTO">
+    	  INSERT INTO tb_membership(m_id, m_pw, m_name, m_ename, m_tel, m_birth, m_email, m_gender, m_info_yn, m_adv_yn, m_ste, m_pt, m_dt)
+          VALUES (#{m_id}, #{m_pw}, #{m_name}, #{m_ename}, #{m_tel}, #{m_birth}, #{m_email}, #{m_gender}, #{m_info_yn}, #{m_adv_yn} ,1, 0, curdate())
+   	</insert>    
+   
+   	<!-- 아이디 중복체크 -->
+   	<select id="checkId" parameterType="String" resultType="Integer">
+		select count(*)
+		  from tb_membership
+		 where m_id = #{m_id};
+	</select>
+   
+   	<!-- 닉네임 중복체크 -->
+   	<select id="checkEname" parameterType="String" resultType="Integer">
+		select count(*)
+   	   	  from tb_membership
+   	   	 where m_ename = #{m_ename};
+   </select>
+   
+   
+   <!-- 아이디 찾기 -->
+   <select id="findId" parameterType="UserDTO" resultType="String">
+		select m_id
+   	  	  from tb_membership
+   	 	 where m_name = #{m_name}
+   	   	   and m_tel = #{m_tel};
+   </select>
+   
+   <!-- 비밀번호 찾기 -->
+   <select id="findPw" parameterType="UserDTO" resultType="String">
+		select m_id
+   	  	  from tb_membership
+		 where m_id = #{m_id}
+		   and m_name = #{m_name}
+		   and m_tel = #{m_tel};
+   </select>
+   
+   <!-- 새 비밀번호 입력 -->
+   <update id="changePw" parameterType="UserDTO">
+		update tb_membership
+   	   	   set m_pw = #{m_pw}
+		 where m_id = #{m_id};
+   </update>
+   
+ 	
+ <!-- ======================================================== 게 시 판 ======================================================== -->
+	
+   	<!-- 공지 게시물 건수 조회 -->
+   	<select id="getListCnt" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where BD_STE = 0
+      	   and BD_GROUP = 1
+      	 order by bd_num desc
+   	</select>
+   
+   	<!-- 공지 게시판 -->
+   	<select id="list" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select *
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_group = 1
+      	 order by bd_num desc
+     	 limit #{startList}, #{listSize};
+	</select>
+   
+   
+   	<!-- 인기 게시물 건수 조회 -->
+   	<select id="getPopCnt" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_recomm > 19
+      	   and bd_group > 1
+		 order by bd_num desc
+   	</select>
+   
+ 	<!-- 인기 게시판 -->
+    <select id="list_pop" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select *
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_recomm > 19
+      	   and bd_group > 1
+      	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>
+   
+   
+   	<!-- 메인 게시물 건수 조회 -->
+   	<select id="getMainCnt" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_group = 2
+      	 order by bd_num desc
+   	</select>
+   
+   	<!-- 메인 게시판-->
+   	<select id="list_main" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select *
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_group = 2 
+      	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>
+   
+   
+   	<!-- 자유 게시물 건수 조회 -->
+   	<select id="getFreeCnt" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_group = 3
+      	 order by bd_num desc
+   	</select>
+   
+  	 <!-- 자유 게시판-->
+    <select id="list_free" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select *
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and bd_group = 3
+      	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>
+   
+   
+   
+ <!-- ======================================================== 레지스터, 디테일 ======================================================== --> 
+
+
+	<!--  글 읽기 -->
+	<select id="detail" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select * 
+      	  from TB_MSG_BOARD
+      	 where bd_num = #{bd_num}
+   	</select>
+	
+	<!--  글 쓰기 -->
+   	<insert id="register" parameterType="BoardDTO">
+	INSERT INTO TB_MSG_BOARD(m_ename, m_id, bd_num, bd_tl, bd_con, bd_dt, bd_ref, bd_recomm, bd_ste, bd_group, q_end)
+         VALUES (#{m_ename}, #{m_id}, #{bd_num}, #{bd_tl},#{bd_con}, curdate(),0,0,0, #{bd_group}, #{q_end})
+   	</insert>	
+   	
+   	<!--  글 수정 -->
+   	<update id="update" parameterType="BoardDTO">
+		update TB_MSG_BOARD
+       	   set bd_tl = #{bd_tl},
+               bd_con = #{bd_con},
+               bd_dt = curdate()
+      	 where bd_num = #{bd_num}
+  	</update>
+   
+   	<!--  글 삭제 bd_ste 컬럼을 1로 변경 -->
+   	<update id="delete" parameterType="java.lang.Integer">
+		UPDATE TB_MSG_BOARD 
+		   SET bd_ste = 1
+      	 WHERE bd_num = #{bd_num};
+   	</update>            
+   	
+  	<!--  조회수 증가 -->
+   	<update id="updateReadCnt" parameterType="java.lang.Integer">
+		update TB_MSG_BOARD
+           set bd_ref = bd_ref + 1
+         where bd_num = #{bd_num}
+   	</update>
+   
+   
+   	<!-- 추천수 증가 -->
+   	<update id="recommUp" parameterType="java.lang.Integer">
+		update TB_MSG_BOARD
+           set bd_recomm = bd_recomm + 1
+         where bd_num = #{bd_num}
+   	</update>
+   	<!-- 추천수 감소 -->
+   	<update id="recommDown" parameterType="java.lang.Integer">
+		update TB_MSG_BOARD
+       	   set bd_recomm = bd_recomm - 1
+      	 where bd_num = #{bd_num}
+   	</update>
+
+	<!-- 게시글 추천시 테이블에 인서트 -->
+   	<insert id="insertRecomm" parameterType="Recomm">
+		insert into tb_bd_recomm (recomm_num, m_id, bd_num, m_recomm)
+   			  value (#{recomm_num}, #{m_id}, #{bd_num}, 0)
+   	</insert>
+	<!--  게시글 추천 취소시 딜리트 -->
+   	<delete id="deleteRecomm" parameterType="Recomm">
+		delete from tb_bd_recomm
+   	 	 where bd_num = #{bd_num}
+   		   and m_id = #{m_id}
+   	</delete>
+    
+   	<!-- 개인 추천 관리(업) -->
+   	<update id="userRecommUp" parameterType="Recomm">
+		update tb_bd_recomm
+   		   set m_recomm = 1
+   		 where bd_num = #{bd_num}
+   		   and m_id = #{m_id}
+   		   and m_recomm = 0; 
+   	</update> 
+   
+   	<!-- 추천 중복 방지 -->
+   	<select id="recommCheck" parameterType="Recomm" resultType="java.lang.Integer">
+		select count(*)
+   		  from tb_bd_recomm
+   		 where bd_num = #{bd_num}
+   		   and m_id = #{m_id}   
+   	</select>
+   
+   
+
+<!-- ======================================================== 댓글 ======================================================== -->
+	       
+   	<!-- 댓글목록 조회(게시글번호에 해당하는 조회) -->
+   	<select id="detailList" parameterType="java.lang.Integer" resultType="BoardReply">
+		SELECT comm_num, m_ename, comm_con, comm_dt, bd_num, m_id
+       	  FROM tb_comments
+      	 WHERE bd_num = #{bd_num}
+     	 ORDER BY comm_num desc
+   	</select>
+   
+   	<!-- 해당 댓글 읽기  -->
+   	<select id="detailReply" parameterType="java.lang.Integer" resultType="BoardReply">
+		SELECT comm_num, m_id, comm_con, comm_dt, bd_num
+       	  FROM tb_comments
+      	 WHERE comm_num = #{comm_num}
+   	</select>
+
+   	<!-- 댓글 쓰기 -->
+   	<insert id="reply" parameterType="BoardReply">
+		INSERT INTO tb_comments(m_id, m_ename, comm_con, comm_dt, bd_num)
+         	 VALUES (#{m_id}, #{m_ename}, #{comm_con}, curdate(), #{bd_num})
+   	</insert>
+      
+   	<!-- 댓글 수정 -->
+   	<update id="replyUpdate" parameterType="BoardReply">
+		update tb_comments
+           set comm_con = #{comm_con},
+           	   comm_dt = curdate()
+      	 where comm_num = #{comm_num} 
+   	</update>
+
+   	<!-- 댓글 삭제 -->
+   	<delete id="replyDelete" parameterType="BoardReply">
+		DELETE FROM tb_comments 
+      	 WHERE comm_num = #{comm_num} 
+   	</delete>
+
+
+	<!-- ======================================================== 포인트 ======================================================== -->
+  
+   	<!-- 포인트 -->
+   	<insert id="usePoint" parameterType="pointDTO">
+    	INSERT INTO tb_point_list(p_num, p_cd, p_name, p_tel, p_date, p_condition, m_id, m_ename, p_info_yn, p_adv_yn, p_cd_name)
+             VALUES (#{p_num}, #{p_cd}, #{p_name}, #{p_tel}, curdate(), 1, #{m_id}, #{m_ename}, #{p_info_yn}, #{p_adv_yn}, #{p_cd_name})
+   	</insert>
+
+   
+
+   
+   
+   	<!-- ======================================================== 마이페이지(유저) ======================================================== -->
+   
+   
+	<!-- 마이페이지 - 회원정보 변경 -->
+   	<select id ="myPageUserSelect" parameterType="java.lang.String" resultType="UserDTO">
+		select * 
+      	  from tb_membership
+      	 where m_id = #{m_id}
+   	</select>   
+    <!-- 마이페이지 - 회원정보 수정 --> 
+   	<update id="userUpdate" parameterType="UserDTO" >
+		update tb_membership
+           set   m_pw = #{m_pw},
+                 m_ename = #{m_ename},
+                 m_email = #{m_email},
+                 m_tel = #{m_tel},
+                 m_adv_yn = #{m_adv_yn},
+                 m_pt = #{m_pt}
+       	   where m_id = #{m_id}   
+   	</update>
+   
+ 	<!-- 회원 탈퇴 -->
+	<update id="userDelete" parameterType="UserDTO">
+		update tb_membership
+		   set m_ste = 2
+		 where m_id = #{m_id}
+		   and m_pw = #{m_pw}
+	</update>  
+
+	<!-- 마이페이지 출석 포인트 -->
+   	<update id="ptUpdate" parameterType="UserDTO">
+		update TB_MEMBERSHIP
+           set m_pt = #{m_pt} + 5,
+           	   m_attd = #{m_attd} + 1,
+           	   m_pt_dt = curdate()
+       	 where m_id = #{m_id};
+   	</update>   	
+    <!-- 출석체크 후 세션 다시 불러오기 -->
+   	<select id="mySelect" parameterType="java.lang.String" resultType="UserDTO">
+		select *
+   	  	  from tb_membership
+   	 	 where m_id = #{m_id};
+   	</select>
+   
+   
+ 	<!-- 내 게시글 건수 조회-->
+   	<select id="getMyCnt" parameterType="String" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where bd_ste = 0
+      	   and m_id = #{m_id}
+      	 order by bd_num desc 
+	</select>
+    <!-- 내 게시글 -->
+   	<select id="myPageListMy" parameterType="BoardDTO" resultType="BoardDTO">
+		select *
+      	  from TB_MSG_BOARD
+     	 where bd_ste = 0
+       	   and m_id = #{m_id} 
+      	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>
+    
+    
+    <!-- 나의 문의 건수 조회 -->
+   	<select id="getRequestMyCnt" parameterType="String" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+     	 where BD_STE = 0
+		   and BD_GROUP = 4
+		   and m_id = #{m_id}
+      	 order by bd_num desc
+   	</select> 
+   	<!-- 나의 문의 -->
+   	<select id="myPageQuestion" parameterType="BoardDTO" resultType="BoardDTO">
+		select BD_NUM,M_ID,BD_TL,BD_CON,BD_DT,BD_GROUP,BD_STE,M_ENAME,Q_END
+      	  from TB_MSG_BOARD
+      	 where BD_STE = 0
+      	   and BD_GROUP = 4
+      	   and m_id = #{m_id}
+      	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>  
+     
+    
+    <!-- 나의 포인트 사용 내역 건수 -->
+   	<select id="getUseMyPointCnt" parameterType="PointDTO" resultType="java.lang.Integer">
+		select count(*)
+      	  from tb_point_list
+      	 where m_id = #{m_id}
+      	 order by p_num desc
+   	</select> 
+   	
+   	<!-- 나의 포인트 사용 내역 -->
+   	<select id="myPageUsePoint" parameterType="PointDTO" resultType="PointDTO">
+		select *
+      	  from tb_point_list
+      	 where m_id = #{m_id}
+      	 order by p_num desc
+     	 limit #{startList}, #{listSize};
+ 	</select>
+
+
+	<!-- ======================================================== 마이페이지(관리자) ======================================================== -->
+
+ 	<!--  관리자 정보 수정 (삭제) -->
+	
+	<!-- 전체 회원 조회 -->
+    <select id="getMemberCnt" resultType="java.lang.Integer">
+		select count(*)
+		  from tb_membership
+    </select>
+   
+	<!-- 회원관리 -->
+	<select id="manage" resultType="UserDTO">
+		select *
+		  from tb_Membership
+      	 order by m_ste
+      	 limit #{startList}, #{listSize};
+	</select>
+	<!-- 회원정보 상세조회 -->
+   	<select id ="userDetail" parameterType="java.lang.String" resultType="UserDTO">
+		select * 
+      	  from tb_membership
+     	 where m_id = #{m_id};
+   	</select>
+   
+      
+   	<!-- 대기 문의 건수 조회 -->
+   	<select id="getRequestCnt" resultType="java.lang.Integer">
+   	   select count(*)
+         from TB_MSG_BOARD
+     	where BD_STE = 0
+      	  and BD_GROUP = 4
+      	  and q_end = 2
+  	    order by bd_num desc
+   	</select>  
+   	<!-- 대기 문의 -->
+   	<select id="adminPageQuestion" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select BD_NUM,M_ID,BD_TL,BD_CON,BD_DT,BD_GROUP,BD_STE,M_ENAME,Q_END
+      	  from TB_MSG_BOARD
+      	 where BD_STE = 0
+     	   and BD_GROUP = 4
+      	  and q_end = 2
+       	 order by bd_num desc
+      	 limit #{startList}, #{listSize};
+   	</select>  
+   
+	<!-- 대기 문의 처리 완료  -->
+   	<update id="questionSuccess" parameterType="java.lang.Integer">
+		UPDATE TB_MSG_BOARD SET q_end = 3
+     	 WHERE bd_num = #{bd_num};
+   	</update> 
+	<!-- 문의 처리 완료 건수 조회 -->
+	<select id="getRequestSuccessCnt" resultType="java.lang.Integer">
+		select count(*)
+      	  from TB_MSG_BOARD
+      	 where BD_STE = 0
+		   and BD_GROUP = 4
+      	   and q_end = 3
+     	 order by bd_num desc
+   	</select>  
+   	<!-- 문의 처리 완료 -->
+   	<select id="adminPageQuestionSuccess" parameterType="java.lang.Integer" resultType="BoardDTO">
+		select BD_NUM,M_ID,BD_TL,BD_CON,BD_DT,BD_GROUP,BD_STE,M_ENAME,Q_END
+      	  from TB_MSG_BOARD
+      	 where BD_STE = 0
+      	   and BD_GROUP = 4
+      	   and q_end = 3
+      	 order by bd_num desc
+     	 limit #{startList}, #{listSize};
+   	</select>  
+      
+
+   	<!-- 관리자 포인트 처리 대기 -->
+   	<select id="getPointCnt" parameterType="String" resultType="java.lang.Integer">
+		select count(*)
+      	  from tb_point_list
+      	 where p_condition = 1
+   	</select>
+	<!-- 관리자 포인트 처리 대기 -->
+   	<select id="adminPageUsePoint" parameterType="java.lang.Integer" resultType="PointDTO">
+		select P_NUM, P_CD, P_NAME, P_TEL, P_DATE, P_CONDITION, P_CD_NAME, P_INFO_YN, P_ADV_YN
+      	  from tb_point_list
+      	 where p_condition = 1
+     	 order by p_num desc
+     	 limit #{startList}, #{listSize};
+   	</select>
+   	<!--  포인트 처리 내역 디테일 -->
+   	<select id="usePointDetail" parameterType="java.lang.Integer" resultType="PointDTO">
+		select * 
+      	  from tb_point_list
+     	 where p_num = #{p_num}
+   	</select> 
+	<!-- 포인트 완료 처리하기  -->
+   	<update id="usePointSuccess" parameterType="java.lang.Integer">
+		UPDATE tb_point_list 
+      	   SET p_condition = 2
+     	 WHERE p_num = #{p_num};
+   	</update>
+   	
+     <!-- 관리자 포인트 처리 완료 -->
+     <select id="adminPageUsePointSuccess" parameterType="java.lang.Integer" resultType="PointDTO">
+		select P_NUM, P_CD, P_NAME, P_TEL, P_DATE, P_CONDITION, P_CD_NAME, P_INFO_YN, P_ADV_YN
+          from tb_point_list
+         where p_condition = 2
+         order by p_num desc
+         limit #{startList}, #{listSize};
+      </select>
+   	<!-- 포인트리스트 건수 조회 -->
+   	<select id="getPointSuccessCnt" parameterType="PointDTO" resultType="java.lang.Integer">
+		select count(*)
+      	  from tb_point_list
+      	 order by p_num desc
+   	</select> 
+   	
+   	
+	<!--  회원정보 삭제 M_STE 컬럼을 작성하여 2로 변경 -->
+   	<update id="adminuserdelete" parameterType="java.lang.String">
+   	   update tb_membership 
+   	      set m_ste = 2
+   	    where m_id = #{m_id}
+   	</update> 
+   
+
+
+
+
+
+	
+   
+   
+
+      
+</mapper>

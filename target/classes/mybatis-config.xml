@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+	     <typeAlias alias="BoardDTO" type="kr.co.dong.board.BoardDTO"/>
+	     <typeAlias alias="BoardReply" type="kr.co.dong.board.BoardReply"/>
+	     <typeAlias alias="UserDTO" type="kr.co.dong.user.UserDTO"/>
+	     <typeAlias alias="paging" type="kr.co.dong.board.paging"/>
+	     <typeAlias alias="PointDTO" type="kr.co.dong.board.PointDTO"/>
+	     <typeAlias alias="Recomm" type="kr.co.dong.board.Recomm"/>
+	</typeAliases>
+</configuration>

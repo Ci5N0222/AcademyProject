@@ -1,0 +1,2 @@
+2023-05-19 18:58:44,028 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2023-05-19 19:09:08,220 [Worker-16: Git Repository Change Scanner] WARN  org.eclipse.jgit.lib.Repository - close() called when useCnt is already zero for Repository[C:\Users\vmfps\git\AcademyProject\.git]
