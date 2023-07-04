@@ -32,4 +32,4 @@
   </ul>
 
 <h4>화면 설계, DB규칙, JOB_LIST 등등
-  Issues --> AcademyProject Image </h4>
+[프로젝트 구상 화면.pdf](https://github.com/Ci5N0222/AcademyProject/files/11949725/default.pdf)
