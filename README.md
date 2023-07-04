@@ -31,6 +31,5 @@
     <li>IDE(개발환경) - Eclipse(4.22.0)</li>
   </ul>
 
-**<h4>화면 설계, DB규칙, JOB_LIST 등등
-*[프로젝트 구상 화면1.pdf]
-*(https://github.com/Ci5N0222/AcademyProject/files/11949740/1.pdf)
+<h4>화면 설계, DB규칙, JOB_LIST 등등<br>
+[프로젝트 구상 화면1.pdf](https://github.com/Ci5N0222/AcademyProject/files/11949740/1.pdf)
